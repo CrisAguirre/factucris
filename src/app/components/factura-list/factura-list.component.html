@@ -1,0 +1,45 @@
+<div class="glass-panel main-pad">
+  <div class="list-header">
+    <h3>Registro Histórico de Facturas</h3>
+    <button routerLink="/dashboard/new" class="btn-primary">Nueva Factura</button>
+  </div>
+
+  <div *ngIf="loading" class="loading-state">
+    <p>Cargando facturas...</p>
+  </div>
+
+  <div *ngIf="!loading && facturas.length === 0" class="empty-state">
+    <p>No hay facturas registradas en la base de datos.</p>
+  </div>
+
+  <div *ngIf="!loading && facturas.length > 0" class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>Orden</th>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Teléfono</th>
+          <th>Detalle</th>
+          <th>Cant.</th>
+          <th>Valor Und.</th>
+          <th>Total</th>
+          <th>Nota</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let fact of facturas">
+          <td><strong>#{{ fact.orden_ingreso }}</strong></td>
+          <td>{{ fact.fecha | date:'mediumDate' }}</td>
+          <td>{{ fact.nombre }}</td>
+          <td>{{ fact.telefono || '-' }}</td>
+          <td>{{ fact.descripcion || '-' }}</td>
+          <td>{{ fact.cantidad }}</td>
+          <td>{{ fact.valor_und | currency }}</td>
+          <td><strong>{{ fact.valor_total | currency }}</strong></td>
+          <td>{{ fact.nota || '-' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

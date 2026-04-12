@@ -1,0 +1,28 @@
+<div class="login-wrapper">
+  <div class="glass-panel login-card">
+    <div class="login-header">
+      <h2 style="color: var(--primary-color);">Factucris</h2>
+      <p class="subtitle">Sistema de Archivo</p>
+    </div>
+
+    <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+      <div class="form-group">
+        <label class="form-label">Usuario</label>
+        <input type="text" class="form-control" name="user" [(ngModel)]="user" required placeholder="Escriba su usuario">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input type="password" class="form-control" name="pass" [(ngModel)]="pass" required placeholder="••••••••">
+      </div>
+
+      <div class="error-banner" *ngIf="error">
+        {{ error }}
+      </div>
+
+      <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;" [disabled]="!loginForm.valid">
+        Ingresar al Sistema
+      </button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,68 @@
+<div class="glass-panel form-container">
+  <div class="form-header">
+    <h3>Registrar Nueva Factura</h3>
+    <button routerLink="/dashboard/list" class="back-link">← Volver al Listado</button>
+  </div>
+
+  <div *ngIf="error" class="error-banner">{{ error }}</div>
+
+  <form (ngSubmit)="onSubmit()" #facturaForm="ngForm">
+    <div class="grid-layout">
+      <!-- Fila 1 -->
+      <div class="form-group">
+        <label class="form-label">Orden de Ingreso *</label>
+        <input type="number" class="form-control" name="orden_ingreso" [(ngModel)]="factura.orden_ingreso" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Fecha *</label>
+        <input type="date" class="form-control" name="fecha" [(ngModel)]="factura.fecha" required>
+      </div>
+
+      <!-- Fila 2 -->
+      <div class="form-group" style="grid-column: span 2;">
+        <label class="form-label">Nombre del Cliente *</label>
+        <input type="text" class="form-control" name="nombre" [(ngModel)]="factura.nombre" required placeholder="Nombre completo">
+      </div>
+
+      <!-- Fila 3 -->
+      <div class="form-group">
+        <label class="form-label">Teléfono</label>
+        <input type="text" class="form-control" name="telefono" [(ngModel)]="factura.telefono" placeholder="Número de contacto">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Detalle / Descripción</label>
+        <input type="text" class="form-control" name="descripcion" [(ngModel)]="factura.descripcion" placeholder="Concepto factura">
+      </div>
+
+      <!-- Fila 4 -->
+      <div class="form-group">
+        <label class="form-label">Cantidad *</label>
+        <input type="number" min="1" class="form-control" name="cantidad" [(ngModel)]="factura.cantidad" (ngModelChange)="calcularTotal()" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Valor Unitario ($) *</label>
+        <input type="number" step="0.01" class="form-control" name="valor_und" [(ngModel)]="factura.valor_und" (ngModelChange)="calcularTotal()" required>
+      </div>
+
+      <!-- Fila 5 -->
+      <div class="form-group">
+        <label class="form-label">Valor Total ($) *</label>
+        <input type="number" class="form-control total-field" name="valor_total" [(ngModel)]="factura.valor_total" readonly>
+      </div>
+
+      <div class="form-group" style="grid-column: span 2;">
+        <label class="form-label">Nota o Comentario Adicional</label>
+        <textarea class="form-control" name="nota" [(ngModel)]="factura.nota" rows="2" placeholder="Observaciones extras..."></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary btn-save" [disabled]="!facturaForm.form.valid || isSubmitting">
+        {{ isSubmitting ? 'Guardando...' : 'Guardar Factura' }}
+      </button>
+    </div>
+  </form>
+</div>

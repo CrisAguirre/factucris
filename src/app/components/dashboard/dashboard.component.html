@@ -1,0 +1,31 @@
+<div class="dashboard-layout">
+  <aside class="sidebar glass-panel">
+    <div class="sidebar-brand">
+      <h3>Factucris</h3>
+      <span class="user-badge">Admin</span>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <a routerLink="./list" routerLinkActive="active-link" class="nav-item">
+        📋 Histórico de Facturas
+      </a>
+      <a routerLink="./new" routerLinkActive="active-link" class="nav-item">
+        ➕ Nueva Factura
+      </a>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <button class="btn-logout" (click)="onLogout()">Cerrar Sesión</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-header glass-panel">
+      <h4>Sistema de Archivo de Facturas</h4>
+    </header>
+
+    <div class="content-area">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

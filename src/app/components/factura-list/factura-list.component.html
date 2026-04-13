@@ -1,7 +1,9 @@
 <div class="glass-panel main-pad">
-  <div class="list-header">
+  <div class="list-header" style="display: flex; gap: 10px; flex-wrap: wrap;">
     <h3>Registro Histórico de Facturas</h3>
     <button routerLink="/dashboard/new" class="btn-primary">Nueva Factura</button>
+    <button (click)="exportarExcel()" class="btn-primary" style="background:#27ae60;">Exportar a Excel</button>
+    <button (click)="cerrarMes()" class="btn-primary" style="background:#c0392b;">Cerrar Mes</button>
   </div>
 
   <div *ngIf="loading" class="loading-state">
@@ -25,11 +27,12 @@
           <th>Valor Und.</th>
           <th>Total</th>
           <th>Nota</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let fact of facturas">
-          <td><strong>#{{ fact.orden_ingreso }}</strong></td>
+          <td><strong>#{{ padOrden(fact.orden_ingreso) }}</strong></td>
           <td>{{ fact.fecha | date:'mediumDate' }}</td>
           <td>{{ fact.nombre }}</td>
           <td>{{ fact.telefono || '-' }}</td>
@@ -38,6 +41,10 @@
           <td>{{ fact.valor_und | currency }}</td>
           <td><strong>{{ fact.valor_total | currency }}</strong></td>
           <td>{{ fact.nota || '-' }}</td>
+          <td style="display: flex; gap: 5px;">
+            <button (click)="imprimirPdf(fact)" style="padding: 4px 8px; background: #2980b9; color: white; border: none; border-radius: 4px; cursor: pointer;" title="Imprimir PDF">PDF</button>
+            <button (click)="deleteFactura(fact)" style="padding: 4px 8px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;" title="Borrar">X</button>
+          </td>
         </tr>
       </tbody>
     </table>

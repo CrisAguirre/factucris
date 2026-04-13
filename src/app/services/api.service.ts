@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 
 export interface Factura {
   _id?: string;
-  orden_ingreso: number;
+  orden_ingreso?: number;
   fecha: Date | string;
   nombre: string;
   telefono?: string;
@@ -30,5 +30,13 @@ export class ApiService {
 
   createFactura(factura: Factura): Observable<Factura> {
     return this.http.post<Factura>(this.baseUrl, factura);
+  }
+
+  deleteFactura(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${id}`);
+  }
+
+  cierreMes(): Observable<any> {
+    return this.http.post(`${this.baseUrl}/cierre-mes/ejecutar`, {});
   }
 }

@@ -9,7 +9,6 @@ import { ApiService, Factura } from '../../services/api.service';
 })
 export class FacturaFormComponent {
   factura: Factura = {
-    orden_ingreso: 1, // Por defecto o ultimo + 1
     fecha: new Date().toISOString().substring(0,10),
     nombre: '',
     telefono: '',

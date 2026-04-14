@@ -16,6 +16,19 @@ export interface Factura {
   nota?: string;
 }
 
+export interface Cierre {
+  _id?: string;
+  mes_nombre: string;
+  fecha_cierre: Date | string;
+  total_ingresos: number;
+  cantidad_registros: number;
+  periodo: {
+    inicio: Date | string;
+    fin: Date | string;
+  };
+  registros: Factura[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -38,5 +51,14 @@ export class ApiService {
 
   cierreMes(): Observable<any> {
     return this.http.post(`${this.baseUrl}/cierre-mes/ejecutar`, {});
+  }
+
+  // Historial de Cierres
+  getCierres(): Observable<Cierre[]> {
+    return this.http.get<Cierre[]>(`${this.baseUrl}/cierres`);
+  }
+
+  getCierreById(id: string): Observable<Cierre> {
+    return this.http.get<Cierre>(`${this.baseUrl}/cierres/${id}`);
   }
 }

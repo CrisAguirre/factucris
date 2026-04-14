@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiService, Factura } from '../../services/api.service';
+import { ApiService, Factura, Cierre } from '../../services/api.service';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as xlsx from 'xlsx';
@@ -11,14 +11,18 @@ import * as xlsx from 'xlsx';
 })
 export class FacturaListComponent implements OnInit {
   facturas: Factura[] = [];
+  cierres: Cierre[] = [];
   loading: boolean = true;
   facturaVistaPrevia: Factura | null = null;
+  cierreVistaPrevia: Cierre | null = null;
+  mostrarModalCierres: boolean = false;
   logoBase64: string = '';
 
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
     this.loadFacturas();
+    this.loadCierres();
     this.loadLogo();
   }
 
@@ -50,6 +54,30 @@ export class FacturaListComponent implements OnInit {
     });
   }
 
+  loadCierres() {
+    this.apiService.getCierres().subscribe({
+      next: (data) => {
+        this.cierres = data;
+      },
+      error: (err) => console.error('Error fetching history', err)
+    });
+  }
+
+  // Historial
+  abrirHistorialCierres() {
+    this.loadCierres();
+    this.mostrarModalCierres = true;
+  }
+
+  cerrarModalCierres() {
+    this.mostrarModalCierres = false;
+    this.cierreVistaPrevia = null;
+  }
+
+  seleccionarCierre(cierre: Cierre) {
+    this.cierreVistaPrevia = cierre;
+  }
+
   // Borrar Factura (Recibo)
   deleteFactura(factura: Factura) {
     if (confirm(`¿Estás seguro de que deseas borrar el recibo #${factura.orden_ingreso}?`)) {
@@ -66,15 +94,19 @@ export class FacturaListComponent implements OnInit {
 
   // Cerrar Mes
   cerrarMes() {
-    if (confirm('¿Deseas cerrar el mes? Esto sumará los ingresos y limpiará la base de datos para reiniciar el consecutivo a 0001. ESTA ACCIÓN ES IRREVERSIBLE.')) {
+    if (confirm('¿Deseas cerrar el mes? Esto guardará un reporte histórico, sumará los ingresos y limpiará la base de datos para reiniciar el consecutivo a 0001. ESTA ACCIÓN ES IRREVERSIBLE.')) {
       const authPass = prompt('Acción Crítica: Ingresa la contraseña de seguridad para confirmar el cierre de mes:');
       if (authPass === 'Peguelonorre@') {
         this.apiService.cierreMes().subscribe({
           next: (res) => {
-            alert(`Mes cerrado. Total de Ingresos: $${res.total}. Recibos borrados: ${res.facturasBorradas}`);
+            alert(`Mes cerrado exitosamente y guardado en historial. Total de Ingresos: $${res.total}.`);
             this.loadFacturas();
+            this.loadCierres();
           },
-          error: (err) => console.error('Error cerrando mes', err)
+          error: (err) => {
+            alert('Error al cerrar mes: ' + (err.error?.message || 'Error desconocido'));
+            console.error('Error cerrando mes', err);
+          }
         });
       } else {
         alert('Contraseña incorrecta. El cierre de mes ha sido abortado por motivos de seguridad.');
@@ -189,8 +221,9 @@ export class FacturaListComponent implements OnInit {
     doc.save(`Recibo_${ym}_${String(fact.orden_ingreso).padStart(4, '0')}.pdf`);
   }
 
-  // Exportar Excel
+  // Exportar Excel de cierres (Opcional, pero se añade por completitud)
   exportarExcel() {
+    // ... codigo anterior resumido por brevedad en este chunk para enfocarme en los cierres
     const exportData = this.facturas.map(f => ({
       Orden: f.orden_ingreso,
       Fecha: typeof f.fecha === 'string' ? f.fecha.substring(0, 10) : new Date(f.fecha).toISOString().substring(0, 10),
@@ -204,20 +237,71 @@ export class FacturaListComponent implements OnInit {
     }));
 
     const worksheet = xlsx.utils.json_to_sheet([]);
-    
-    // Añadimos títulos personalizados para mejorar el diseño inicial
     xlsx.utils.sheet_add_aoa(worksheet, [['Gestión de Facturas - Registro Histórico de Recibos']], { origin: 'A1' });
-    xlsx.utils.sheet_add_aoa(worksheet, [['']], { origin: 'A2' }); // Fila vacía para separar
-    
-    // Añadimos la data a partir de la fila 3
+    xlsx.utils.sheet_add_aoa(worksheet, [['']], { origin: 'A2' });
     xlsx.utils.sheet_add_json(worksheet, exportData, { origin: 'A3' });
-
     const workbook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(workbook, worksheet, 'Recibos');
-    
-    // Descargar como archivo XLSX real para evitar bloqueos
     const ymList = this.getYearMonth();
     xlsx.writeFile(workbook, `Listado_Recibos_${ymList}.xlsx`);
+  }
+
+  // EXPORTACION DE CIERRES
+  descargarWordCierre() {
+    const content = document.getElementById('cierreReporteArea')?.innerHTML;
+    if (!content) return;
+    const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+    <head><meta charset='utf-8'><title>Cierre Mensual</title></head><body>`;
+    const footer = "</body></html>";
+    const sourceHTML = header + content + footer;
+    const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+    const fileDownload = document.createElement("a");
+    document.body.appendChild(fileDownload);
+    fileDownload.href = source;
+    fileDownload.download = `Cierre_${this.cierreVistaPrevia?.mes_nombre.replace(' ', '_')}.doc`;
+    fileDownload.click();
+    document.body.removeChild(fileDownload);
+  }
+
+  descargarPdfCierre() {
+    if (!this.cierreVistaPrevia) return;
+    const c = this.cierreVistaPrevia;
+    const doc = new jsPDF();
+    
+    // Logo
+    if (this.logoBase64) {
+      doc.addImage(this.logoBase64, 'PNG', 85, 10, 40, 20); 
+    }
+
+    doc.setFontSize(20);
+    doc.text('REPORTE CONSOLIDADO MENSUAL', 105, 45, { align: 'center' });
+    doc.setFontSize(16);
+    doc.text(c.mes_nombre.toUpperCase(), 105, 55, { align: 'center' });
+
+    doc.setFontSize(12);
+    const fInicio = typeof c.periodo.inicio === 'string' ? c.periodo.inicio.substring(0, 10) : new Date(c.periodo.inicio).toISOString().substring(0, 10);
+    const fFin = typeof c.periodo.fin === 'string' ? c.periodo.fin.substring(0, 10) : new Date(c.periodo.fin).toISOString().substring(0, 10);
+    doc.text(`Periodo: ${fInicio} al ${fFin}`, 20, 70);
+    doc.text(`Cantidad de Recibos: ${c.cantidad_registros}`, 20, 80);
+    doc.setFontSize(14);
+    doc.text(`TOTAL INGRESOS: $${c.total_ingresos}`, 140, 80);
+
+    const tableData = c.registros.map(f => [
+      `#${this.padOrden(f.orden_ingreso)}`,
+      typeof f.fecha === 'string' ? f.fecha.substring(0, 10) : new Date(f.fecha).toISOString().substring(0, 10),
+      f.nombre,
+      `$${f.valor_total}`
+    ]);
+
+    autoTable(doc, {
+      startY: 90,
+      head: [['Orden', 'Fecha', 'Cliente', 'Total']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { fillColor: [44, 62, 80] }
+    });
+
+    doc.save(`Cierre_${c.mes_nombre.replace(' ', '_')}.pdf`);
   }
 
   padOrden(num: number | undefined): string {

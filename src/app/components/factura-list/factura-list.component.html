@@ -1,6 +1,7 @@
 <div class="glass-panel main-pad">
   <div class="list-header" style="display: flex; gap: 10px; flex-wrap: wrap;">
     <h3>Registro Histórico de Recibos</h3>
+    <button (click)="abrirHistorialCierres()" class="btn-primary" style="background:#8e44ad;">Historial de Cierres</button>
     <button routerLink="/dashboard/new" class="btn-primary">Nuevo Recibo</button>
     <button (click)="exportarExcel()" class="btn-primary" style="background:#27ae60;">Exportar a Excel</button>
     <button (click)="cerrarMes()" class="btn-primary" style="background:#c0392b;">Cerrar Mes</button>
@@ -102,6 +103,75 @@
         <div *ngIf="facturaVistaPrevia.nota" style="margin-top: 20px; padding: 10px; background: #f9f9f9; border-left: 4px solid #3498db;">
           <strong>Nota:</strong> {{ facturaVistaPrevia.nota }}
         </div>
+      </div>
+
+<!-- Modal Historial de Cierres -->
+<div class="modal-overlay" *ngIf="mostrarModalCierres">
+  <div class="modal-content" style="max-width: 800px;">
+    <div class="modal-header" style="display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;">
+      <h3 style="color: #2c3e50;">Historial de Cierres Mensuales</h3>
+      <button (click)="cerrarModalCierres()" class="btn-action btn-close">Cerrar</button>
+    </div>
+
+    <!-- Lista de Meses -->
+    <div *ngIf="!cierreVistaPrevia">
+      <div *ngIf="cierres.length === 0" style="padding: 20px; text-align: center; color: #7f8c8d;">
+        <p>No hay cierres mensuales registrados aún.</p>
+      </div>
+      <div class="cierres-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+        <div *ngFor="let c of cierres" (click)="seleccionarCierre(c)" class="glass-panel" 
+             style="padding: 15px; cursor: pointer; border: 1px solid #3498db; transition: transform 0.2s;">
+          <h4 style="margin: 0; color: #2980b9;">{{ c.mes_nombre }}</h4>
+          <p style="font-size: 0.9rem; margin: 10px 0 5px;">Total: <strong>{{ c.total_ingresos | currency }}</strong></p>
+          <small style="color: #7f8c8d;">Recibos: {{ c.cantidad_registros }}</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista de Resultado de Cierre Seleccionado -->
+    <div *ngIf="cierreVistaPrevia">
+      <div class="modal-actions no-print">
+        <button (click)="cierreVistaPrevia = null" class="btn-action btn-close" style="background: #34495e;">Volver al Listado</button>
+        <button (click)="descargarWordCierre()" class="btn-action btn-word">Exportar Word</button>
+        <button (click)="descargarPdfCierre()" class="btn-action btn-pdf">Exportar PDF</button>
+      </div>
+
+      <div id="cierreReporteArea" style="padding: 30px; border: 1px solid #ccc; background: #fff;">
+        <div style="text-align: center; border-bottom: 2px solid #2c3e50; padding-bottom: 15px; margin-bottom: 20px;">
+          <img [src]="logoBase64 ? logoBase64 : 'assets/logo.png'" style="max-height: 70px; margin-bottom: 10px;">
+          <h2 style="margin: 0;">REPORTE CONSOLIDADO MENSUAL</h2>
+          <h3 style="color: #2980b9;">{{ cierreVistaPrevia.mes_nombre }}</h3>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+          <div>
+            <p><strong>Fecha de Cierre:</strong> {{ cierreVistaPrevia.fecha_cierre | date:'medium' }}</p>
+            <p><strong>Periodo:</strong> {{ cierreVistaPrevia.periodo.inicio | date:'shortDate' }} al {{ cierreVistaPrevia.periodo.fin | date:'shortDate' }}</p>
+          </div>
+          <div style="text-align: right;">
+            <p><strong>Recibos Procesados:</strong> {{ cierreVistaPrevia.cantidad_registros }}</p>
+            <h3 style="color: #c0392b; margin: 0;">TOTAL: {{ cierreVistaPrevia.total_ingresos | currency }}</h3>
+          </div>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+          <thead>
+            <tr style="background: #2c3e50; color: white;">
+              <th style="padding: 8px; border: 1px solid #ddd;">Orden</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Fecha</th>
+              <th style="padding: 8px; border: 1px solid #ddd;">Cliente</th>
+              <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let reg of cierreVistaPrevia.registros">
+              <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">#{{ padOrden(reg.orden_ingreso) }}</td>
+              <td style="padding: 6px; border: 1px solid #ddd;">{{ reg.fecha | date:'shortDate' }}</td>
+              <td style="padding: 6px; border: 1px solid #ddd;">{{ reg.nombre }}</td>
+              <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">{{ reg.valor_total | currency }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

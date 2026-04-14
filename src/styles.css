@@ -109,3 +109,64 @@ th {
 tr:hover td {
   background-color: rgba(249, 250, 251, 0.5);
 }
+
+/* -----------------------------
+   NIGHT MODE (TURQUOISE + NEON)
+   ----------------------------- */
+body.dark-mode {
+  --bg-gradient: radial-gradient(circle at center, #075f68 0%, #032128 100%); /* Dark turquoise */
+  --surface-color: rgba(0, 30, 40, 0.85); /* Darker glass effect */
+  --text-main: #e0f7fa;
+  --text-muted: #80ced6;
+  --border-color: rgba(0, 255, 255, 0.4);
+}
+
+body.dark-mode .glass-panel {
+  border: 2px solid #fff !important;
+  animation: neonPulser 1.5s infinite alternate !important;
+  box-shadow: none;
+}
+
+body.dark-mode input.form-control,
+body.dark-mode textarea.form-control {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+body.dark-mode input.form-control::placeholder,
+body.dark-mode textarea.form-control::placeholder {
+  color: #80ced6;
+}
+
+body.dark-mode table th {
+  background-color: rgba(0, 255, 255, 0.15);
+  color: #fff;
+}
+
+body.dark-mode table td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode tr:hover td {
+  background-color: rgba(0, 255, 255, 0.1);
+}
+
+body.dark-mode h3, body.dark-mode h4, body.dark-mode strong {
+  color: #fff !important;
+}
+
+body.dark-mode .nav-item {
+  color: #e0f7fa;
+}
+
+@keyframes neonPulser {
+  from {
+    border-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(0, 255, 255, 0.5), inset 0 0 5px rgba(0, 255, 255, 0.2);
+  }
+  to {
+    border-color: #fff;
+    box-shadow: 0 0 15px #fff, 0 0 25px #0ff, inset 0 0 15px #0ff;
+  }
+}

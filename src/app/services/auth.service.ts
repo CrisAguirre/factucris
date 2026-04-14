@@ -16,7 +16,7 @@ export class AuthService {
 
   login(user: string, pass: string): boolean {
     // Hardcoded credentials for single user validation as requested
-    if (user === 'Cris' && pass === '2026@') {
+    if (user === 'CrisLeona' && pass === 'M@1d3n!') {
       localStorage.setItem('factucris_auth', 'true');
       this.isAuthSubject.next(true);
       return true;

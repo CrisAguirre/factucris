@@ -21,8 +21,11 @@
   </aside>
 
   <main class="main-content">
-    <header class="top-header glass-panel">
-      <h4>Sistema de Archivo de Recibos</h4>
+    <header class="top-header glass-panel" style="display: flex; justify-content: space-between; align-items: center;">
+      <h4 style="margin: 0;">Sistema de Archivo</h4>
+      <button (click)="toggleNightMode()" class="btn-primary" style="background-color: #0c2461; border: 1px solid #00d2d3;">
+        {{ isNightMode ? '☀️ Modo Día' : '🌙 Modo Noche' }}
+      </button>
     </header>
 
     <div class="content-area">

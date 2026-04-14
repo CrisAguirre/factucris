@@ -66,14 +66,19 @@ export class FacturaListComponent implements OnInit {
 
   // Cerrar Mes
   cerrarMes() {
-    if (confirm('¿Deseas cerrar el mes? Esto sumará los ingresos y limpiará la base de datos para reiniciar el consecutivo a 0001.')) {
-      this.apiService.cierreMes().subscribe({
-        next: (res) => {
-          alert(`Mes cerrado. Total de Ingresos: $${res.total}. Recibos borrados: ${res.facturasBorradas}`);
-          this.loadFacturas();
-        },
-        error: (err) => console.error('Error cerrando mes', err)
-      });
+    if (confirm('¿Deseas cerrar el mes? Esto sumará los ingresos y limpiará la base de datos para reiniciar el consecutivo a 0001. ESTA ACCIÓN ES IRREVERSIBLE.')) {
+      const authPass = prompt('Acción Crítica: Ingresa la contraseña de seguridad para confirmar el cierre de mes:');
+      if (authPass === 'Peguelonorre@') {
+        this.apiService.cierreMes().subscribe({
+          next: (res) => {
+            alert(`Mes cerrado. Total de Ingresos: $${res.total}. Recibos borrados: ${res.facturasBorradas}`);
+            this.loadFacturas();
+          },
+          error: (err) => console.error('Error cerrando mes', err)
+        });
+      } else {
+        alert('Contraseña incorrecta. El cierre de mes ha sido abortado por motivos de seguridad.');
+      }
     }
   }
 

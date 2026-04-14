@@ -52,7 +52,7 @@
   </div>
 </div>
 
-<!-- Modal Vista Previa -->
+<!-- Modal Vista Previa de Recibo Individual -->
 <div class="modal-overlay" *ngIf="facturaVistaPrevia">
   <div class="modal-content">
     <div class="modal-actions no-print">
@@ -104,6 +104,9 @@
           <strong>Nota:</strong> {{ facturaVistaPrevia.nota }}
         </div>
       </div>
+    </div>
+  </div>
+</div>
 
 <!-- Modal Historial de Cierres -->
 <div class="modal-overlay" *ngIf="mostrarModalCierres">
@@ -132,8 +135,8 @@
     <div *ngIf="cierreVistaPrevia">
       <div class="modal-actions no-print">
         <button (click)="cierreVistaPrevia = null" class="btn-action btn-close" style="background: #34495e;">Volver al Listado</button>
-        <button (click)="descargarWordCierre()" class="btn-action btn-word">Exportar Word</button>
-        <button (click)="descargarPdfCierre()" class="btn-action btn-pdf">Exportar PDF</button>
+        <button (click)="descargarWordCierre()" class="btn-action btn-word">Word</button>
+        <button (click)="descargarPdfCierre()" class="btn-action btn-pdf">PDF</button>
       </div>
 
       <div id="cierreReporteArea" style="padding: 30px; border: 1px solid #ccc; background: #fff;">

@@ -88,12 +88,21 @@ export class FacturaListComponent implements OnInit {
 
   // Descargar Word
   descargarWord() {
-    const reciboArea = document.getElementById('reciboArea')?.innerHTML;
-    if (!reciboArea) return;
+    const reciboAreaNode = document.getElementById('reciboArea');
+    if (!reciboAreaNode) return;
+    
+    // Clonamos el nodo para no afectar la vista
+    const clone = reciboAreaNode.cloneNode(true) as HTMLElement;
+    // Eliminamos el logo en Word porque los base64 generan una 'X' de imagen rota en MS Word
+    const logoImg = clone.querySelector('#logo-preview');
+    if (logoImg) {
+      logoImg.remove();
+    }
+
     const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
     <head><meta charset='utf-8'><title>Recibo</title></head><body>`;
     const footer = "</body></html>";
-    const sourceHTML = header + reciboArea + footer;
+    const sourceHTML = header + clone.innerHTML + footer;
 
     const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
     const fileDownload = document.createElement("a");
@@ -116,26 +125,36 @@ export class FacturaListComponent implements OnInit {
     const fact = this.facturaVistaPrevia;
     const doc = new jsPDF();
     
+    let currentY = 20;
+
     // Si tenemos el logo
     if (this.logoBase64) {
-      doc.addImage(this.logoBase64, 'PNG', 85, 10, 40, 40); // centrado y tamaño apx 40x40
+      const imgProps = doc.getImageProperties(this.logoBase64);
+      const pdfWidth = doc.internal.pageSize.getWidth();
+      // Reducido a altura de 20 (aprox 50% del anterior que era 40) y respetando proporciones
+      const imgHeight = 20; 
+      const imgWidth = (imgProps.width * imgHeight) / imgProps.height;
+      const xOffset = (pdfWidth - imgWidth) / 2;
+      
+      doc.addImage(this.logoBase64, 'PNG', xOffset, 10, imgWidth, imgHeight); 
+      currentY = 45; // Bajamos el texto para que no se sobreponga
     }
     
     // Título
     doc.setFontSize(22);
-    doc.text('Gestión de Facturas', 105, 60, { align: 'center' });
+    doc.text('Gestión de Facturas', 105, currentY, { align: 'center' });
     
     doc.setFontSize(14);
-    doc.text('RECIBO', 105, 70, { align: 'center' });
+    doc.text('RECIBO', 105, currentY + 10, { align: 'center' });
     
     // Datos de la factura
     doc.setFontSize(11);
-    doc.text(`Orden de Ingreso: #${String(fact.orden_ingreso).padStart(4, '0')}`, 20, 90);
+    doc.text(`Orden de Ingreso: #${String(fact.orden_ingreso).padStart(4, '0')}`, 20, currentY + 30);
     const fecha = typeof fact.fecha === 'string' ? fact.fecha.substring(0, 10) : new Date(fact.fecha).toISOString().substring(0, 10);
-    doc.text(`Fecha: ${fecha}`, 140, 90);
+    doc.text(`Fecha: ${fecha}`, 140, currentY + 30);
     
-    doc.text(`Cliente: ${fact.nombre}`, 20, 100);
-    if(fact.telefono) doc.text(`Teléfono: ${fact.telefono}`, 140, 100);
+    doc.text(`Cliente: ${fact.nombre}`, 20, currentY + 40);
+    if(fact.telefono) doc.text(`Teléfono: ${fact.telefono}`, 140, currentY + 40);
 
     // Tabla de Items
     const tableData = [
@@ -148,7 +167,7 @@ export class FacturaListComponent implements OnInit {
     ];
 
     autoTable(doc, {
-      startY: 115,
+      startY: currentY + 55,
       head: [['Cant.', 'Descripción', 'V. Unitario', 'V. Total']],
       body: tableData,
       theme: 'grid',
@@ -157,7 +176,7 @@ export class FacturaListComponent implements OnInit {
 
     if (fact.nota) {
       // @ts-ignore
-      const finalY = doc.lastAutoTable.finalY || 140;
+      const finalY = doc.lastAutoTable.finalY || (currentY + 80);
       doc.text(`Nota: ${fact.nota}`, 20, finalY + 15);
     }
 
@@ -167,64 +186,33 @@ export class FacturaListComponent implements OnInit {
 
   // Exportar Excel
   exportarExcel() {
-    let tablaHTML = `
-      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-      <head>
-      <meta charset="utf-8">
-      <style>
-        table { border-collapse: collapse; font-family: Arial, sans-serif; }
-        th, td { border: 1px solid #000; padding: 6px; text-align: left; }
-        th { background-color: #2980b9; color: white; font-weight: bold; }
-        .center { text-align: center; }
-        .currency { text-align: right; }
-      </style>
-      </head>
-      <body>
-      <table border="1" cellpadding="5">
-        <tr>
-          <td colspan="9" style="text-align: center; background-color: #f8f9fa; padding: 15px;">
-            <img src="${this.logoBase64}" height="60" style="margin-bottom: 5px;"><br>
-            <strong style="font-size: 16pt; color: #2c3e50;">Gestión de Facturas - Registro Histórico de Recibos</strong>
-          </td>
-        </tr>
-        <tr>
-          <th>Orden</th>
-          <th>Fecha</th>
-          <th>Cliente</th>
-          <th>Teléfono</th>
-          <th>Descripción</th>
-          <th>Cantidad</th>
-          <th>Valor Und</th>
-          <th>Total</th>
-          <th>Nota</th>
-        </tr>`;
+    const exportData = this.facturas.map(f => ({
+      Orden: f.orden_ingreso,
+      Fecha: typeof f.fecha === 'string' ? f.fecha.substring(0, 10) : new Date(f.fecha).toISOString().substring(0, 10),
+      Cliente: f.nombre,
+      Telefono: f.telefono,
+      Descripcion: f.descripcion,
+      Cantidad: f.cantidad,
+      'Valor Und': f.valor_und,
+      Total: f.valor_total,
+      Nota: f.nota
+    }));
 
-    this.facturas.forEach(f => {
-      const fecha = typeof f.fecha === 'string' ? f.fecha.substring(0, 10) : new Date(f.fecha).toISOString().substring(0, 10);
-      tablaHTML += `
-        <tr>
-          <td class="center">#${this.padOrden(f.orden_ingreso)}</td>
-          <td>${fecha}</td>
-          <td>${f.nombre}</td>
-          <td>${f.telefono || ''}</td>
-          <td>${f.descripcion || ''}</td>
-          <td class="center">${f.cantidad}</td>
-          <td class="currency">$${f.valor_und}</td>
-          <td class="currency"><strong>$${f.valor_total}</strong></td>
-          <td>${f.nota || ''}</td>
-        </tr>`;
-    });
+    const worksheet = xlsx.utils.json_to_sheet([]);
+    
+    // Añadimos títulos personalizados para mejorar el diseño inicial
+    xlsx.utils.sheet_add_aoa(worksheet, [['Gestión de Facturas - Registro Histórico de Recibos']], { origin: 'A1' });
+    xlsx.utils.sheet_add_aoa(worksheet, [['']], { origin: 'A2' }); // Fila vacía para separar
+    
+    // Añadimos la data a partir de la fila 3
+    xlsx.utils.sheet_add_json(worksheet, exportData, { origin: 'A3' });
 
-    tablaHTML += '</table></body></html>';
-
-    const source = 'data:application/vnd.ms-excel;charset=utf-8,' + encodeURIComponent(tablaHTML);
-    const fileDownload = document.createElement("a");
-    document.body.appendChild(fileDownload);
-    fileDownload.href = source;
+    const workbook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(workbook, worksheet, 'Recibos');
+    
+    // Descargar como archivo XLSX real para evitar bloqueos
     const ymList = this.getYearMonth();
-    fileDownload.download = `Listado_Recibos_${ymList}.xls`;
-    fileDownload.click();
-    document.body.removeChild(fileDownload);
+    xlsx.writeFile(workbook, `Listado_Recibos_${ymList}.xlsx`);
   }
 
   padOrden(num: number | undefined): string {

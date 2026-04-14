@@ -88,3 +88,72 @@
   flex: 1;
   overflow-y: auto;
 }
+
+/* Responsiveness for Mobile Devices */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    padding: 10px;
+  }
+
+  .sidebar {
+    width: 100%;
+    margin-bottom: 20px;
+    flex-direction: column !important;
+    align-items: center;
+    padding: 15px;
+  }
+
+  .sidebar-brand {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .sidebar-nav {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+
+  .nav-item {
+    flex: 1;
+    text-align: center;
+    min-width: 150px;
+  }
+
+  .sidebar-footer {
+    width: 100%;
+    margin-top: 5px;
+  }
+
+  .top-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+
+  .eddie-mascot {
+    width: 80px;
+    bottom: 10px;
+    right: 10px;
+  }
+}
+
+.eddie-mascot {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 120px;
+  height: auto;
+  z-index: 1000;
+  pointer-events: none; /* Evita que interrumpa clics en elementos de atrás */
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+  transition: transform 0.3s ease;
+}

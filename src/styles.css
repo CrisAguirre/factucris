@@ -111,45 +111,50 @@ tr:hover td {
 }
 
 /* -----------------------------
-   NIGHT MODE (TURQUOISE + NEON)
+   NIGHT MODE (PURPLE + NEON REDUCED)
    ----------------------------- */
 body.dark-mode {
-  --bg-gradient: radial-gradient(circle at center, #075f68 0%, #032128 100%); /* Dark turquoise */
-  --surface-color: rgba(0, 30, 40, 0.85); /* Darker glass effect */
-  --text-main: #e0f7fa;
-  --text-muted: #80ced6;
-  --border-color: rgba(0, 255, 255, 0.4);
+  --bg-gradient: radial-gradient(circle at center, #2e0942 0%, #0e0017 100%); /* Púrpura oscuro */
+  --surface-color: rgba(20, 0, 30, 0.85); /* Cristal más oscuro con tinte purpura */
+  --text-main: #f5f0ff;
+  --text-muted: #c9b3e6;
+  --border-color: rgba(200, 150, 255, 0.3);
 }
 
 body.dark-mode .glass-panel {
-  border: 2px solid #fff !important;
-  animation: neonPulser 1.5s infinite alternate !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  animation: neonPulser 2s infinite alternate !important;
   box-shadow: none;
+}
+
+body.dark-mode .main-pad {
+  background-color: transparent !important;
+  color: #fff;
 }
 
 body.dark-mode input.form-control,
 body.dark-mode textarea.form-control {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
   color: #fff;
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 body.dark-mode input.form-control::placeholder,
 body.dark-mode textarea.form-control::placeholder {
-  color: #80ced6;
+  color: #c9b3e6;
 }
 
 body.dark-mode table th {
-  background-color: rgba(0, 255, 255, 0.15);
+  background-color: rgba(160, 80, 255, 0.15);
   color: #fff;
 }
 
 body.dark-mode table td {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 body.dark-mode tr:hover td {
-  background-color: rgba(0, 255, 255, 0.1);
+  background-color: rgba(160, 80, 255, 0.1);
 }
 
 body.dark-mode h3, body.dark-mode h4, body.dark-mode strong {
@@ -157,16 +162,17 @@ body.dark-mode h3, body.dark-mode h4, body.dark-mode strong {
 }
 
 body.dark-mode .nav-item {
-  color: #e0f7fa;
+  color: #f5f0ff;
 }
 
+/* Reduced neon brightness */
 @keyframes neonPulser {
   from {
-    border-color: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(0, 255, 255, 0.5), inset 0 0 5px rgba(0, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 2px rgba(255, 255, 255, 0.3), 0 0 5px rgba(200, 150, 255, 0.3), inset 0 0 2px rgba(200, 150, 255, 0.1);
   }
   to {
-    border-color: #fff;
-    box-shadow: 0 0 15px #fff, 0 0 25px #0ff, inset 0 0 15px #0ff;
+    border-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 15px rgba(200, 150, 255, 0.6), inset 0 0 8px rgba(200, 150, 255, 0.3);
   }
 }

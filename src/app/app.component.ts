@@ -30,10 +30,12 @@ export class AppComponent implements OnInit, OnDestroy {
     
     // 5 minutes = 300000 milliseconds
     this.inactiveTimeout = setTimeout(() => {
-      if (this.authService.isAuthenticated()) {
+      const currentHour = new Date().getHours();
+      // Solo se activa el cierre automático si son las 20:00 (8 PM) o más tarde
+      if (this.authService.isAuthenticated() && currentHour >= 20) {
         this.authService.logout();
         this.router.navigate(['/login']);
-        alert('Por tu seguridad, la sesión ha expirado tras 5 minutos de inactividad.');
+        alert('Por tu seguridad, la sesión ha expirado tras 5 minutos de inactividad (Política de Seguridad Nocturna).');
       }
     }, 300000);
   }

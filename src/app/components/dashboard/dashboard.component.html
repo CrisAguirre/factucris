@@ -1,11 +1,12 @@
-<div class="dashboard-layout">
+Del<div class="dashboard-layout">
   <aside class="sidebar glass-panel">
     <div class="sidebar-brand">
-      <img src="assets/logo.png" alt="Logo" class="app-logo" style="width: 50px; height: auto; border-radius: 8px; margin-bottom: 10px;">
+      <img src="assets/logo.png" alt="Logo" class="app-logo"
+        style="width: 50px; height: auto; border-radius: 8px; margin-bottom: 10px;">
       <h3>Gestión de Facturas</h3>
       <span class="user-badge" style="margin-left: 5px;">Admin</span>
     </div>
-    
+
     <nav class="sidebar-nav">
       <a routerLink="./list" routerLinkActive="active-link" class="nav-item">
         📋 Histórico de Recibos
@@ -14,7 +15,7 @@
         ➕ Nuevo Recibo
       </a>
     </nav>
-    
+
     <div class="sidebar-footer">
       <button class="btn-logout" (click)="onLogout()">Cerrar Sesión</button>
     </div>
@@ -23,7 +24,8 @@
   <main class="main-content">
     <header class="top-header glass-panel" style="display: flex; justify-content: space-between; align-items: center;">
       <h4 style="margin: 0;">Sistema de Archivo</h4>
-      <button (click)="toggleNightMode()" class="btn-primary" style="background-color: #0c2461; border: 1px solid #00d2d3;">
+      <button (click)="toggleNightMode()" class="btn-primary"
+        style="background-color: #0c2461; border: 1px solid #00d2d3;">
         {{ isNightMode ? '☀️ Modo Día' : '🌙 Modo Noche' }}
       </button>
     </header>

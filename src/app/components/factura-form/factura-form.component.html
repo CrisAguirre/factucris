@@ -1,6 +1,6 @@
 <div class="glass-panel form-container">
   <div class="form-header">
-    <h3>Registrar Nueva Factura</h3>
+    <h3>Registrar Nuevo Recibo</h3>
     <button routerLink="/dashboard/list" class="back-link">← Volver al Listado</button>
   </div>
 
@@ -28,7 +28,7 @@
 
       <div class="form-group">
         <label class="form-label">Detalle / Descripción</label>
-        <input type="text" class="form-control" name="descripcion" [(ngModel)]="factura.descripcion" placeholder="Concepto factura">
+        <input type="text" class="form-control" name="descripcion" [(ngModel)]="factura.descripcion" placeholder="Concepto del recibo">
       </div>
 
       <!-- Fila 4 -->
@@ -56,7 +56,7 @@
 
     <div class="form-actions">
       <button type="submit" class="btn-primary btn-save" [disabled]="!facturaForm.form.valid || isSubmitting">
-        {{ isSubmitting ? 'Guardando...' : 'Guardar Factura' }}
+        {{ isSubmitting ? 'Guardando...' : 'Guardar Recibo' }}
       </button>
     </div>
   </form>

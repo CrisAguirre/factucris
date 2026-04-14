@@ -23,3 +23,76 @@
   padding: 40px;
   color: var(--text-muted);
 }
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.btn-action {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+}
+
+.btn-word { background-color: #2980b9; }
+.btn-pdf { background-color: #e74c3c; }
+.btn-print { background-color: #2c3e50; }
+.btn-close { background-color: #7f8c8d; }
+
+.recibo-preview {
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  background: #fff;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #reciboArea, #reciboArea * {
+    visibility: visible;
+  }
+  #reciboArea {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    border: none;
+  }
+  .no-print {
+    display: none !important;
+  }
+}

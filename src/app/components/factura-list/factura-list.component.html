@@ -1,17 +1,17 @@
 <div class="glass-panel main-pad">
   <div class="list-header" style="display: flex; gap: 10px; flex-wrap: wrap;">
-    <h3>Registro Histórico de Facturas</h3>
-    <button routerLink="/dashboard/new" class="btn-primary">Nueva Factura</button>
+    <h3>Registro Histórico de Recibos</h3>
+    <button routerLink="/dashboard/new" class="btn-primary">Nuevo Recibo</button>
     <button (click)="exportarExcel()" class="btn-primary" style="background:#27ae60;">Exportar a Excel</button>
     <button (click)="cerrarMes()" class="btn-primary" style="background:#c0392b;">Cerrar Mes</button>
   </div>
 
   <div *ngIf="loading" class="loading-state">
-    <p>Cargando facturas...</p>
+    <p>Cargando recibos...</p>
   </div>
 
   <div *ngIf="!loading && facturas.length === 0" class="empty-state">
-    <p>No hay facturas registradas en la base de datos.</p>
+    <p>No hay recibos registrados en la base de datos.</p>
   </div>
 
   <div *ngIf="!loading && facturas.length > 0" class="table-responsive">
@@ -42,11 +42,67 @@
           <td><strong>{{ fact.valor_total | currency }}</strong></td>
           <td>{{ fact.nota || '-' }}</td>
           <td style="display: flex; gap: 5px;">
-            <button (click)="imprimirPdf(fact)" style="padding: 4px 8px; background: #2980b9; color: white; border: none; border-radius: 4px; cursor: pointer;" title="Imprimir PDF">PDF</button>
+            <button (click)="abrirVistaPrevia(fact)" style="padding: 4px 8px; background: #8e44ad; color: white; border: none; border-radius: 4px; cursor: pointer;" title="Vista Previa">Vista Previa</button>
             <button (click)="deleteFactura(fact)" style="padding: 4px 8px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;" title="Borrar">X</button>
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- Modal Vista Previa -->
+<div class="modal-overlay" *ngIf="facturaVistaPrevia">
+  <div class="modal-content">
+    <div class="modal-actions no-print">
+      <button (click)="descargarWord()" class="btn-action btn-word">Word</button>
+      <button (click)="descargarPdf()" class="btn-action btn-pdf">PDF</button>
+      <button (click)="imprimirHtml()" class="btn-action btn-print">Imprimir</button>
+      <button (click)="cerrarVistaPrevia()" class="btn-action btn-close">Cerrar</button>
+    </div>
+    
+    <div class="recibo-preview" id="reciboArea">
+      <div class="recibo-header" style="text-align: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px;">
+        <img src="assets/logo.png" style="max-height: 80px; margin-bottom: 10px;" alt="Logo" id="logo-preview">
+        <h2 style="margin: 0; color: #2c3e50;">RECIBO</h2>
+        <p style="margin: 5px 0 0; color: #7f8c8d;">Gestión de Facturas</p>
+      </div>
+      
+      <div class="recibo-body" style="font-family: Arial, sans-serif; color: #333;">
+        <table style="width: 100%; margin-bottom: 20px;">
+          <tr>
+            <td><strong>Orden de Ingreso:</strong> #{{ padOrden(facturaVistaPrevia.orden_ingreso) }}</td>
+            <td style="text-align: right;"><strong>Fecha:</strong> {{ facturaVistaPrevia.fecha | date:'mediumDate' }}</td>
+          </tr>
+          <tr>
+            <td><strong>Cliente:</strong> {{ facturaVistaPrevia.nombre }}</td>
+            <td style="text-align: right;"><strong>Teléfono:</strong> {{ facturaVistaPrevia.telefono || '-' }}</td>
+          </tr>
+        </table>
+
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+          <thead>
+            <tr style="background-color: #f2f2f2;">
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Cant.</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Descripción</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">V. Unitario</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">V. Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border: 1px solid #ddd; padding: 8px;">{{ facturaVistaPrevia.cantidad }}</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">{{ facturaVistaPrevia.descripcion || 'Sin detalle' }}</td>
+              <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">{{ facturaVistaPrevia.valor_und | currency }}</td>
+              <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>{{ facturaVistaPrevia.valor_total | currency }}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div *ngIf="facturaVistaPrevia.nota" style="margin-top: 20px; padding: 10px; background: #f9f9f9; border-left: 4px solid #3498db;">
+          <strong>Nota:</strong> {{ facturaVistaPrevia.nota }}
+        </div>
+      </div>
+    </div>
   </div>
 </div>

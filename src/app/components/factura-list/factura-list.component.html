@@ -62,8 +62,8 @@
     </div>
     
     <div class="recibo-preview" id="reciboArea">
-      <div class="recibo-header" style="text-align: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px;">
-        <img src="assets/logo.png" style="max-height: 80px; margin-bottom: 10px;" alt="Logo" id="logo-preview">
+      <div class="recibo-header" style="text-align: center; border-bottom: 2px solid #2980b9; padding-bottom: 10px; margin-bottom: 20px;">
+        <img [src]="logoBase64 ? logoBase64 : 'assets/logo.png'" style="max-height: 80px; margin-bottom: 10px;" alt="Logo" id="logo-preview">
         <h2 style="margin: 0; color: #2c3e50;">RECIBO</h2>
         <p style="margin: 5px 0 0; color: #7f8c8d;">Gestión de Facturas</p>
       </div>
@@ -80,21 +80,21 @@
           </tr>
         </table>
 
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+        <table width="100%" border="1" cellpadding="8" style="border-collapse: collapse; margin-bottom: 20px; border: 1px solid #ddd;">
           <thead>
             <tr style="background-color: #f2f2f2;">
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Cant.</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Descripción</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">V. Unitario</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: right;">V. Total</th>
+              <th style="padding: 10px; text-align: left; background-color: #2980b9; color: white;">Cant.</th>
+              <th style="padding: 10px; text-align: left; background-color: #2980b9; color: white;">Descripción</th>
+              <th style="padding: 10px; text-align: right; background-color: #2980b9; color: white;">V. Unitario</th>
+              <th style="padding: 10px; text-align: right; background-color: #2980b9; color: white;">V. Total</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td style="border: 1px solid #ddd; padding: 8px;">{{ facturaVistaPrevia.cantidad }}</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">{{ facturaVistaPrevia.descripcion || 'Sin detalle' }}</td>
-              <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">{{ facturaVistaPrevia.valor_und | currency }}</td>
-              <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><strong>{{ facturaVistaPrevia.valor_total | currency }}</strong></td>
+              <td style="padding: 10px; text-align: center;">{{ facturaVistaPrevia.cantidad }}</td>
+              <td style="padding: 10px;">{{ facturaVistaPrevia.descripcion || 'Sin detalle' }}</td>
+              <td style="padding: 10px; text-align: right;">{{ facturaVistaPrevia.valor_und | currency }}</td>
+              <td style="padding: 10px; text-align: right; background-color: #eaf2f8;"><strong>{{ facturaVistaPrevia.valor_total | currency }}</strong></td>
             </tr>
           </tbody>
         </table>

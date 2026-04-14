@@ -99,7 +99,8 @@ export class FacturaListComponent implements OnInit {
     const fileDownload = document.createElement("a");
     document.body.appendChild(fileDownload);
     fileDownload.href = source;
-    fileDownload.download = `Recibo_${this.padOrden(this.facturaVistaPrevia?.orden_ingreso)}.doc`;
+    const ym = this.getYearMonth(this.facturaVistaPrevia?.fecha);
+    fileDownload.download = `Recibo_${ym}_${this.padOrden(this.facturaVistaPrevia?.orden_ingreso)}.doc`;
     fileDownload.click();
     document.body.removeChild(fileDownload);
   }
@@ -160,33 +161,81 @@ export class FacturaListComponent implements OnInit {
       doc.text(`Nota: ${fact.nota}`, 20, finalY + 15);
     }
 
-    doc.save(`Recibo_${String(fact.orden_ingreso).padStart(4, '0')}.pdf`);
+    const ym = this.getYearMonth(fact.fecha);
+    doc.save(`Recibo_${ym}_${String(fact.orden_ingreso).padStart(4, '0')}.pdf`);
   }
 
   // Exportar Excel
   exportarExcel() {
-    const exportData = this.facturas.map(f => ({
-      Orden: f.orden_ingreso,
-      Fecha: typeof f.fecha === 'string' ? f.fecha.substring(0, 10) : new Date(f.fecha).toISOString().substring(0, 10),
-      Cliente: f.nombre,
-      Telefono: f.telefono,
-      Descripcion: f.descripcion,
-      Cantidad: f.cantidad,
-      'Valor Und': f.valor_und,
-      Total: f.valor_total,
-      Nota: f.nota
-    }));
+    let tablaHTML = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+      <meta charset="utf-8">
+      <style>
+        table { border-collapse: collapse; font-family: Arial, sans-serif; }
+        th, td { border: 1px solid #000; padding: 6px; text-align: left; }
+        th { background-color: #2980b9; color: white; font-weight: bold; }
+        .center { text-align: center; }
+        .currency { text-align: right; }
+      </style>
+      </head>
+      <body>
+      <table border="1" cellpadding="5">
+        <tr>
+          <td colspan="9" style="text-align: center; background-color: #f8f9fa; padding: 15px;">
+            <img src="${this.logoBase64}" height="60" style="margin-bottom: 5px;"><br>
+            <strong style="font-size: 16pt; color: #2c3e50;">Gestión de Facturas - Registro Histórico de Recibos</strong>
+          </td>
+        </tr>
+        <tr>
+          <th>Orden</th>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Teléfono</th>
+          <th>Descripción</th>
+          <th>Cantidad</th>
+          <th>Valor Und</th>
+          <th>Total</th>
+          <th>Nota</th>
+        </tr>`;
 
-    const worksheet = xlsx.utils.json_to_sheet(exportData);
-    const workbook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(workbook, worksheet, 'Recibos');
-    
-    // Descargar
-    xlsx.writeFile(workbook, 'Listado_Recibos.xlsx');
+    this.facturas.forEach(f => {
+      const fecha = typeof f.fecha === 'string' ? f.fecha.substring(0, 10) : new Date(f.fecha).toISOString().substring(0, 10);
+      tablaHTML += `
+        <tr>
+          <td class="center">#${this.padOrden(f.orden_ingreso)}</td>
+          <td>${fecha}</td>
+          <td>${f.nombre}</td>
+          <td>${f.telefono || ''}</td>
+          <td>${f.descripcion || ''}</td>
+          <td class="center">${f.cantidad}</td>
+          <td class="currency">$${f.valor_und}</td>
+          <td class="currency"><strong>$${f.valor_total}</strong></td>
+          <td>${f.nota || ''}</td>
+        </tr>`;
+    });
+
+    tablaHTML += '</table></body></html>';
+
+    const source = 'data:application/vnd.ms-excel;charset=utf-8,' + encodeURIComponent(tablaHTML);
+    const fileDownload = document.createElement("a");
+    document.body.appendChild(fileDownload);
+    fileDownload.href = source;
+    const ymList = this.getYearMonth();
+    fileDownload.download = `Listado_Recibos_${ymList}.xls`;
+    fileDownload.click();
+    document.body.removeChild(fileDownload);
   }
 
   padOrden(num: number | undefined): string {
     if (num === undefined) return '0000';
     return String(num).padStart(4, '0');
+  }
+
+  getYearMonth(dateInput?: Date | string): string {
+    const d = dateInput ? new Date(dateInput) : new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    return `${yyyy}_${mm}`;
   }
 }
